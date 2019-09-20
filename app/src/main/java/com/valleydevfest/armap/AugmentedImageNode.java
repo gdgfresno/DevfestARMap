@@ -47,11 +47,13 @@ public class AugmentedImageNode extends AnchorNode {
     public String fileName;
     public CompletableFuture<ModelRenderable> renderable;
     public Node node;
+    public Vector3 position;
 
-    public ARObject(String fileName) {
+    public ARObject(String fileName, Vector3 position) {
       this.fileName = fileName;
       this.renderable = null;
       this.node = null;
+      this.position = position;
     }
   }
 
@@ -60,14 +62,18 @@ public class AugmentedImageNode extends AnchorNode {
   // The augmented image represented by this node.
   private AugmentedImage image;
 
+  // Coordinates:
+  // x: positive - right, negative - left
+  // y: positive - behind, negative - forward
+  // z: positive - down, negative - up
   private ARObject[] arObjectList = {
-    new ARObject("room1.sfb"),
-    new ARObject("room2.sfb"),
-    new ARObject("room3.sfb"),
-    new ARObject("room4.sfb"),
-    new ARObject("room5.sfb"),
-    new ARObject("room6.sfb"),
-    new ARObject("upstairs.sfb")
+    new ARObject("room1.sfb", new Vector3(2.0f, -2.0f, 1)),
+    new ARObject("room2.sfb", new Vector3(2.0f, 2.0f, 1)),
+    new ARObject("room3.sfb", new Vector3(-4.0f, -1.5f, 1)),
+    new ARObject("room4.sfb", new Vector3(-4.5f, -2.0f, 1)),
+    new ARObject("room5.sfb", new Vector3(-5.0f, -1.5f, 1)),
+    new ARObject("room6.sfb", new Vector3(-1.0f, -2.5f, 1)),
+    new ARObject("upstairs.sfb", new Vector3(-0.5f, -3.0f, 1))
   };
 
   private CompletableFuture<ModelRenderable> arrowRenderable;
@@ -140,26 +146,26 @@ public class AugmentedImageNode extends AnchorNode {
     mazeScale = maxImageEdge / mazeEdgeSize;
     Log.w(TAG, String.format("Scale %f", mazeScale));
 
-    arrowNode = new BoardNode();
+    arrowNode = new DirectionalNode(false);
     arrowNode.setParent(this);
     arrowNode.setRenderable(arrowRenderable.getNow(null));
     arrowNode.setLocalPosition(new Vector3(0, 0.1f, 0.5f));
 //    arrowNode.setLookDirection(new Vector3(0, 0, -1));
 
-    rayNode = new BoardNode();
+    rayNode = new DirectionalNode(false);
     rayNode.setParent(this);
     rayNode.setRenderable(rayRenderable);
+    // rayNode.setLookDirection(new Vector3(0, 1f, 0));
 //    rayNode.setLocalPosition(new Vector3(0, 0.5f, 0));
 
-    //rayNode.setLookDirection();
 
-//    for (ARObject arObject : arObjectList) {
-    ARObject arObject = arObjectList[0];
-      arObject.node = new BoardNode();
+    for (ARObject arObject : arObjectList) {
+      arObject.node = new DirectionalNode(true);
       arObject.node.setParent(this);
       arObject.node.setRenderable(arObject.renderable.getNow(null));
-      arObject.node.setLocalPosition(new Vector3(0, 0, 0.5f));
-//    }
+      arObject.node.setLocalPosition(arObject.position);
+      // arObject.node.setLookDirection(new Vector3(0, 1f, 0));
+    }
 
     // Scale Y an extra 10 times to lower the maze wall.
 //    mazeNode.setLocalScale(new Vector3(maze_scale, maze_scale * 0.1f, maze_scale));
