@@ -26,7 +26,9 @@ import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.MaterialFactory;
@@ -42,12 +44,12 @@ import com.google.ar.sceneform.rendering.Texture;
 @SuppressWarnings({"AndroidApiChecker"})
 public class AugmentedImageNode extends AnchorNode {
   class ARObject {
-    public int resourceId;
-    public ModelRenderable renderable;
+    public String fileName;
+    public CompletableFuture<ModelRenderable> renderable;
     public Node node;
 
-    public ARObject(int rId) {
-      this.resourceId = rId;
+    public ARObject(String fileName) {
+      this.fileName = fileName;
       this.renderable = null;
       this.node = null;
     }
@@ -59,13 +61,13 @@ public class AugmentedImageNode extends AnchorNode {
   private AugmentedImage image;
 
   private ARObject[] arObjectList = {
-    new ARObject(R.drawable.room1),
-    new ARObject(R.drawable.room2),
-    new ARObject(R.drawable.room3),
-    new ARObject(R.drawable.room4),
-    new ARObject(R.drawable.room5),
-    new ARObject(R.drawable.room6),
-    new ARObject(R.drawable.upstairs)
+    new ARObject("room1.sfb"),
+    new ARObject("room2.sfb"),
+    new ARObject("room3.sfb"),
+    new ARObject("room4.sfb"),
+    new ARObject("room5.sfb"),
+    new ARObject("room6.sfb"),
+    new ARObject("upstairs.sfb")
   };
 
   private CompletableFuture<ModelRenderable> arrowRenderable;
@@ -85,27 +87,10 @@ public class AugmentedImageNode extends AnchorNode {
         rayRenderable = ShapeFactory.makeCylinder(0.01f, 1.5f,
                 new Vector3(0, 0, 0), material); });
 
-    Texture.Builder textureBuilder = Texture.builder();
     for (ARObject arObject : arObjectList) {
-//      MaterialFactory.makeOpaqueWithColor(context,
-//        new Color(android.graphics.Color.BLUE)).thenAccept(material -> {
-//          arObject.renderable = ShapeFactory.makeCube(
-//            new Vector3(0.5f, 1, 0.01f),
-//            new Vector3(0.0f, 0.0f, 0.0f),
-//            material
-//          );
-//        });
-
-      textureBuilder.setSource(context, arObject.resourceId);
-      textureBuilder.build().thenAccept(texture ->
-        MaterialFactory.makeOpaqueWithTexture(context, texture).thenAccept(material -> {
-          arObject.renderable = ShapeFactory.makeCube(
-            new Vector3(0.5f, 1, 0.01f),
-            new Vector3(0.0f, 0.0f, 0.0f),
-            material
-          );
-        })
-      );
+      arObject.renderable = ModelRenderable.builder()
+              .setSource(context, Uri.parse(arObject.fileName))
+              .build();
     }
   }
 
@@ -133,6 +118,20 @@ public class AugmentedImageNode extends AnchorNode {
       return;
     }
 
+    boolean allDone = Stream.of(arObjectList).allMatch(arObject -> arObject.renderable.isDone());
+    // If any of the models are not loaded, then recurse when all are loaded.
+    if (!allDone) {
+      CompletableFuture.allOf(arObjectList[0].renderable, arObjectList[1].renderable,
+              arObjectList[2].renderable, arObjectList[3].renderable, arObjectList[4].renderable,
+              arObjectList[5].renderable, arObjectList[6].renderable, arrowRenderable)
+          .thenAccept((Void aVoid) -> setImage(image))
+          .exceptionally(
+              throwable -> {
+                Log.e(TAG, "Exception loading", throwable);
+                return null;
+              });
+    }
+
     // Set the anchor based on the center of the image.
     setAnchor(image.createAnchor(image.getCenterPose()));
 
@@ -158,8 +157,8 @@ public class AugmentedImageNode extends AnchorNode {
     ARObject arObject = arObjectList[0];
       arObject.node = new BoardNode();
       arObject.node.setParent(this);
-      arObject.node.setRenderable(arObject.renderable);
-      arObject.node.setLocalPosition(new Vector3(0, 0, -0.5f));
+      arObject.node.setRenderable(arObject.renderable.getNow(null));
+      arObject.node.setLocalPosition(new Vector3(0, 0, 0.5f));
 //    }
 
     // Scale Y an extra 10 times to lower the maze wall.
