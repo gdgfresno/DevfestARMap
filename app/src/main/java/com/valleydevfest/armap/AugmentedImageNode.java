@@ -1,6 +1,4 @@
 /*
- * Copyright 2018 Google LLC
- *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -129,7 +127,6 @@ public class AugmentedImageNode extends AnchorNode {
     arrowNode.setEnabled(false);
     arrowNode.setRenderable(arrowRenderable.getNow(null));
     arrowNode.setLocalPosition(new Vector3(0, 0.1f, 0.5f));
-//    arrowNode.setLookDirection(new Vector3(0, 0, -1));
 
     for (ARObject arObject : arObjectList) {
       arObject.node = new DirectionalNode(true);
@@ -137,45 +134,6 @@ public class AugmentedImageNode extends AnchorNode {
       arObject.node.setRenderable(arObject.renderable.getNow(null));
       arObject.node.setLocalPosition(arObject.position);
     }
-
-    // Scale Y an extra 10 times to lower the maze wall.
-//    mazeNode.setLocalScale(new Vector3(maze_scale, maze_scale * 0.1f, maze_scale));
-
-//    // Make the 4 corner nodes.
-//    Vector3 localPosition = new Vector3();
-//    Node cornerNode;
-//
-//    // Upper left corner.
-//    localPosition.set(-0.5f * image.getExtentX(), 0.0f, -0.5f * image.getExtentZ());
-//    cornerNode = new Node();
-//    cornerNode.setParent(this);
-//    cornerNode.setLocalPosition(localPosition);
-//    cornerNode.setRenderable(ulCorner.getNow(null));
-//
-//    // Upper right corner.
-//    localPosition.set(0.5f * image.getExtentX(), 0.0f, -0.5f * image.getExtentZ());
-//    cornerNode = new Node();
-//    cornerNode.setParent(this);
-//    cornerNode.setLocalPosition(localPosition);
-//    cornerNode.setRenderable(urCorner.getNow(null));
-//
-//    // Lower right corner.
-//    localPosition.set(0.5f * image.getExtentX(), 0.0f, 0.5f * image.getExtentZ());
-//    cornerNode = new Node();
-//    cornerNode.setParent(this);
-//    cornerNode.setLocalPosition(localPosition);
-//    cornerNode.setRenderable(lrCorner.getNow(null));
-//
-//    // Lower left corner.
-//    localPosition.set(-0.5f * image.getExtentX(), 0.0f, 0.5f * image.getExtentZ());
-//    cornerNode = new Node();
-//    cornerNode.setParent(this);
-//    cornerNode.setLocalPosition(localPosition);
-//    cornerNode.setRenderable(llCorner.getNow(null));
-  }
-
-  public AugmentedImage getImage() {
-    return image;
   }
 
   public void updateArrowPose(Pose pose) {
