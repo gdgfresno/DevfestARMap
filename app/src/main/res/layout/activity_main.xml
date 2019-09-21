@@ -21,7 +21,7 @@
 
 
     <fragment android:name="com.valleydevfest.armap.AugmentedImageFragment"
-        android:id="@+id/ux_fragment"
+        android:id="@+id/sceneform_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

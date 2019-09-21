@@ -25,8 +25,6 @@ import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Vector3;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -36,7 +34,6 @@ import com.google.ar.sceneform.rendering.ShapeFactory;
 
 import com.google.ar.core.Pose;
 import com.google.ar.sceneform.math.Quaternion;
-import com.google.ar.sceneform.rendering.Texture;
 
 /**
  * Node for rendering an augmented image.
@@ -67,13 +64,12 @@ public class AugmentedImageNode extends AnchorNode {
   // y: positive - behind, negative - forward
   // z: positive - down, negative - up
   private ARObject[] arObjectList = {
-    new ARObject("room1.sfb", new Vector3(2.0f, -2.0f, 1)),
-    new ARObject("room2.sfb", new Vector3(2.0f, 2.0f, 1)),
-    new ARObject("room3.sfb", new Vector3(-4.0f, -1.5f, 1)),
-    new ARObject("room4.sfb", new Vector3(-4.5f, -2.0f, 1)),
-    new ARObject("room5.sfb", new Vector3(-5.0f, -1.5f, 1)),
-    new ARObject("room6.sfb", new Vector3(-1.0f, -2.5f, 1)),
-    new ARObject("upstairs.sfb", new Vector3(-0.5f, -3.0f, 1))
+    new ARObject("room1.sfb", new Vector3(2.5f, 2.0f, 1)),
+    new ARObject("room2.sfb", new Vector3(2.5f, -3.0f, 1)),
+    new ARObject("room3.sfb", new Vector3(-4.0f, -3.5f, 1)),
+    new ARObject("room4.sfb", new Vector3(-5.5f, -4.0f, 1)),
+    new ARObject("room5.sfb", new Vector3(-6.0f, -3.0f, 1)),
+    new ARObject("upstairs.sfb", new Vector3(3.5f, 8.0f, 1))
   };
 
   private CompletableFuture<ModelRenderable> arrowRenderable;
@@ -128,8 +124,8 @@ public class AugmentedImageNode extends AnchorNode {
     // If any of the models are not loaded, then recurse when all are loaded.
     if (!allDone) {
       CompletableFuture.allOf(arObjectList[0].renderable, arObjectList[1].renderable,
-              arObjectList[2].renderable, arObjectList[3].renderable, arObjectList[4].renderable,
-              arObjectList[5].renderable, arObjectList[6].renderable, arrowRenderable)
+              arObjectList[2].renderable, arObjectList[3].renderable,
+              arObjectList[4].renderable, arObjectList[5].renderable, arrowRenderable)
           .thenAccept((Void aVoid) -> setImage(image))
           .exceptionally(
               throwable -> {
@@ -148,12 +144,14 @@ public class AugmentedImageNode extends AnchorNode {
 
     arrowNode = new DirectionalNode(false);
     arrowNode.setParent(this);
+    arrowNode.setEnabled(false);
     arrowNode.setRenderable(arrowRenderable.getNow(null));
     arrowNode.setLocalPosition(new Vector3(0, 0.1f, 0.5f));
 //    arrowNode.setLookDirection(new Vector3(0, 0, -1));
 
     rayNode = new DirectionalNode(false);
     rayNode.setParent(this);
+    rayNode.setEnabled(false);
     rayNode.setRenderable(rayRenderable);
     // rayNode.setLookDirection(new Vector3(0, 1f, 0));
 //    rayNode.setLocalPosition(new Vector3(0, 0.5f, 0));

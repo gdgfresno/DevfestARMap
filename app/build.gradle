@@ -75,11 +75,6 @@ sceneform.asset('sampledata/models/room5.obj',
         'sampledata/models/room5.sfa',
         'src/main/assets/room5')
 
-sceneform.asset('sampledata/models/room6.obj',
-        'default',
-        'sampledata/models/room6.sfa',
-        'src/main/assets/room6')
-
 sceneform.asset('sampledata/models/upstairs.obj',
         'default',
         'sampledata/models/upstairs.sfa',
