@@ -17,6 +17,7 @@ package com.valleydevfest.armap;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
+
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
@@ -25,9 +26,6 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
-
-import com.google.ar.core.Pose;
-import com.google.ar.sceneform.math.Quaternion;
 
 /**
  * Node for rendering an augmented image.
@@ -42,16 +40,11 @@ public class AugmentedImageNode extends AnchorNode {
 
     public ARObject(String fileName, Vector3 position) {
       this.fileName = fileName;
-      this.renderable = null;
-      this.node = null;
       this.position = position;
     }
   }
 
   private static final String TAG = "AugmentedImageNode";
-
-  // The augmented image represented by this node.
-  private AugmentedImage image;
 
   // Coordinates:
   // x: positive - right, negative - left
@@ -66,8 +59,9 @@ public class AugmentedImageNode extends AnchorNode {
     new ARObject("upstairs.sfb", new Vector3(3.5f, 8.0f, 1))
   };
 
+  private int selectedNode = -1;
   private CompletableFuture<ModelRenderable> arrowRenderable;
-  private Node arrowNode;
+  private PointerNode arrowNode;
 
   public AugmentedImageNode(Context context) {
     arrowRenderable = ModelRenderable.builder()
@@ -83,28 +77,10 @@ public class AugmentedImageNode extends AnchorNode {
 
   /**
    * Called when the AugmentedImage is detected and should be rendered. A Sceneform node tree is
-   * created based on an Anchor created from the image. The corners are then positioned based on the
-   * extents of the image. There is no need to worry about world coordinates since everything is
-   * relative to the center of the image, which is the parent node of the corners.
+   * created based on an Anchor created from the image.
    */
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
   public void setImage(AugmentedImage image) {
-    this.image = image;
-
-    // Initialize mazeNode and set its parents and the Renderable.
-    // If any of the models are not loaded, process this function
-    // until they all are loaded.
-    if (!arrowRenderable.isDone()) {
-      CompletableFuture.allOf(arrowRenderable)
-              .thenAccept((Void aVoid) -> setImage(image))
-              .exceptionally(
-                      throwable -> {
-                        Log.e(TAG, "Exception loading", throwable);
-                        return null;
-                      });
-      return;
-    }
-
     boolean allDone = Stream.of(arObjectList).allMatch(arObject -> arObject.renderable.isDone());
     // If any of the models are not loaded, then recurse when all are loaded.
     if (!allDone) {
@@ -122,25 +98,26 @@ public class AugmentedImageNode extends AnchorNode {
     // Set the anchor based on the center of the image.
     setAnchor(image.createAnchor(image.getCenterPose()));
 
-    arrowNode = new DirectionalNode(false);
+    arrowNode = new PointerNode();
     arrowNode.setParent(this);
     arrowNode.setEnabled(false);
     arrowNode.setRenderable(arrowRenderable.getNow(null));
-    arrowNode.setLocalPosition(new Vector3(0, 0.1f, 0.5f));
+    // arrowNode.setLocalPosition(new Vector3(0, 0, 0)); //0.5f));
 
     for (ARObject arObject : arObjectList) {
-      arObject.node = new DirectionalNode(true);
+      arObject.node = new BillBoardNode();
       arObject.node.setParent(this);
       arObject.node.setRenderable(arObject.renderable.getNow(null));
       arObject.node.setLocalPosition(arObject.position);
     }
   }
 
-  public void updateArrowPose(Pose pose) {
-    if (arrowNode == null)
-      return;
+  public void setSelectedNode(int nodeIndex) {
+    // if (selectedNode < 0)
+    //   arrowNode.setParent(getScene().getCamera());
 
-    // arrowNode.setLocalPosition(new Vector3(pose.tx(), pose.ty(), pose.tz()));
-    arrowNode.setLocalRotation(new Quaternion(pose.qx(), pose.qy(), pose.qz(), pose.qw()));
+    selectedNode = nodeIndex;
+    arrowNode.setEnabled(true);
+    arrowNode.setTrackedNode(arObjectList[nodeIndex].node);
   }
 }

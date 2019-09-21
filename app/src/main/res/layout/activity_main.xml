@@ -1,37 +1,120 @@
-<!--
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
--->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AugmentedImageActivity">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-
-    <fragment android:name="com.valleydevfest.armap.AugmentedImageFragment"
-        android:id="@+id/sceneform_fragment"
+    <FrameLayout
+        android:id="@+id/sceneform_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@id/gallery_layout"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintVertical_weight="9">
+
+        <fragment
+            android:id="@+id/sceneform_fragment"
+            android:name="com.valleydevfest.armap.AugmentedImageFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
 
-  <ImageView
-      android:id="@+id/image_view_fit_to_scan"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_gravity="center"
-      android:scaleType="fitCenter"
-      android:src="@drawable/fit_to_scan"
-      android:contentDescription="@string/fit_image_to_scan"
-      />
+        <ImageView
+            android:id="@+id/image_view_fit_to_scan"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:contentDescription="@string/fit_image_to_scan"
+            android:scaleType="fitCenter"
+            android:src="@drawable/fit_to_scan" />
 
-</FrameLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/gallery_layout"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@android:drawable/menuitem_background"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sceneform_frame"
+        app:layout_constraintVertical_chainStyle="spread"
+        app:layout_constraintVertical_weight="2">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/menuitem_background"
+            android:onClick="room1ButtonClick"
+            android:text="@string/room1_title"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/menuitem_background"
+            android:onClick="room2ButtonClick"
+            android:text="@string/room2_title"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/menuitem_background"
+            android:onClick="room3ButtonClick"
+            android:text="@string/room3_title"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/menuitem_background"
+            android:onClick="room4ButtonClick"
+            android:outlineProvider="paddedBounds"
+            android:text="@string/room4_title"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/menuitem_background"
+            android:onClick="room5ButtonClick"
+            android:text="@string/room5_title"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@android:drawable/menuitem_background"
+            android:onClick="upstairsButtonClick"
+            android:text="@string/upstairs_title"
+            android:textAlignment="center"
+            android:textColor="@android:color/holo_red_light"
+            android:textSize="36sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
