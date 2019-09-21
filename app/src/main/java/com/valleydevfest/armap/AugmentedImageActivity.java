@@ -121,33 +121,4 @@ public class AugmentedImageActivity extends AppCompatActivity {
       }
     }
   }
-
-  public void directionButtonClick(int nodeIndex) {
-    if (augmentedImageNode != null)
-      augmentedImageNode.setSelectedNode(nodeIndex);
-  }
-
-  public void room1ButtonClick(View view) {
-    directionButtonClick(0);
-  }
-
-  public void room2ButtonClick(View view) {
-    directionButtonClick(1);
-  }
-
-  public void room3ButtonClick(View view) {
-    directionButtonClick(2);
-  }
-
-  public void room4ButtonClick(View view) {
-    directionButtonClick(3);
-  }
-
-  public void room5ButtonClick(View view) {
-    directionButtonClick(4);
-  }
-
-  public void upstairsButtonClick(View view) {
-    directionButtonClick(5);
-  }
 }

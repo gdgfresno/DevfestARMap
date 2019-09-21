@@ -44,11 +44,6 @@ dependencies {
 apply plugin: 'com.google.ar.sceneform.plugin'
 
 
-sceneform.asset('sampledata/models/arrow.obj',
-        'default',
-        'sampledata/models/arrow.sfa',
-        'src/main/assets/arrow')
-
 sceneform.asset('sampledata/models/room1.obj',
         'default',
         'sampledata/models/room1.sfa',

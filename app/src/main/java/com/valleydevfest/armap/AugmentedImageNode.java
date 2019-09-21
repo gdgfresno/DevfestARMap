@@ -59,15 +59,7 @@ public class AugmentedImageNode extends AnchorNode {
     new ARObject("upstairs.sfb", new Vector3(3.5f, 8.0f, 1))
   };
 
-  private int selectedNode = -1;
-  private CompletableFuture<ModelRenderable> arrowRenderable;
-  private PointerNode arrowNode;
-
   public AugmentedImageNode(Context context) {
-    arrowRenderable = ModelRenderable.builder()
-      .setSource(context, Uri.parse("arrow.sfb"))
-      .build();
-
     for (ARObject arObject : arObjectList) {
       arObject.renderable = ModelRenderable.builder()
               .setSource(context, Uri.parse(arObject.fileName))
@@ -86,7 +78,7 @@ public class AugmentedImageNode extends AnchorNode {
     if (!allDone) {
       CompletableFuture.allOf(arObjectList[0].renderable, arObjectList[1].renderable,
               arObjectList[2].renderable, arObjectList[3].renderable,
-              arObjectList[4].renderable, arObjectList[5].renderable, arrowRenderable)
+              arObjectList[4].renderable, arObjectList[5].renderable)
           .thenAccept((Void aVoid) -> setImage(image))
           .exceptionally(
               throwable -> {
@@ -98,26 +90,11 @@ public class AugmentedImageNode extends AnchorNode {
     // Set the anchor based on the center of the image.
     setAnchor(image.createAnchor(image.getCenterPose()));
 
-    arrowNode = new PointerNode();
-    arrowNode.setParent(this);
-    arrowNode.setEnabled(false);
-    arrowNode.setRenderable(arrowRenderable.getNow(null));
-    // arrowNode.setLocalPosition(new Vector3(0, 0, 0)); //0.5f));
-
     for (ARObject arObject : arObjectList) {
       arObject.node = new BillBoardNode();
       arObject.node.setParent(this);
       arObject.node.setRenderable(arObject.renderable.getNow(null));
       arObject.node.setLocalPosition(arObject.position);
     }
-  }
-
-  public void setSelectedNode(int nodeIndex) {
-    // if (selectedNode < 0)
-    //   arrowNode.setParent(getScene().getCamera());
-
-    selectedNode = nodeIndex;
-    arrowNode.setEnabled(true);
-    arrowNode.setTrackedNode(arObjectList[nodeIndex].node);
   }
 }

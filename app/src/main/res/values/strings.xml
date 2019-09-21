@@ -2,10 +2,4 @@
 <resources>
   <string name="app_name">Valley Devfest AR Map</string>
   <string name="fit_image_to_scan">Fit image to scan</string>
-  <string name="room1_title">&gt;1&lt;</string>
-  <string name="room2_title">&gt;2&lt;</string>
-  <string name="room3_title">&gt;3&lt;</string>
-  <string name="room4_title">&gt;4&lt;</string>
-  <string name="room5_title">&gt;5&lt;</string>
-  <string name="upstairs_title">&gt;⬆&lt;</string>
 </resources>
