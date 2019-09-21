@@ -28,10 +28,6 @@ import com.google.ar.sceneform.rendering.ModelRenderable;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import com.google.ar.sceneform.rendering.Color;
-import com.google.ar.sceneform.rendering.MaterialFactory;
-import com.google.ar.sceneform.rendering.ShapeFactory;
-
 import com.google.ar.core.Pose;
 import com.google.ar.sceneform.math.Quaternion;
 
@@ -74,20 +70,11 @@ public class AugmentedImageNode extends AnchorNode {
 
   private CompletableFuture<ModelRenderable> arrowRenderable;
   private Node arrowNode;
-  private ModelRenderable rayRenderable;
-  private Node rayNode;
-
-  private float mazeScale = 0.0f;
 
   public AugmentedImageNode(Context context) {
     arrowRenderable = ModelRenderable.builder()
       .setSource(context, Uri.parse("arrow.sfb"))
       .build();
-
-    MaterialFactory.makeOpaqueWithColor(context,
-      new Color(android.graphics.Color.RED)).thenAccept(material -> {
-        rayRenderable = ShapeFactory.makeCylinder(0.01f, 1.5f,
-                new Vector3(0, 0, 0), material); });
 
     for (ARObject arObject : arObjectList) {
       arObject.renderable = ModelRenderable.builder()
@@ -137,11 +124,6 @@ public class AugmentedImageNode extends AnchorNode {
     // Set the anchor based on the center of the image.
     setAnchor(image.createAnchor(image.getCenterPose()));
 
-    final float mazeEdgeSize = 492.65f;
-    final float maxImageEdge = Math.max(image.getExtentX(), image.getExtentZ());
-    mazeScale = maxImageEdge / mazeEdgeSize;
-    Log.w(TAG, String.format("Scale %f", mazeScale));
-
     arrowNode = new DirectionalNode(false);
     arrowNode.setParent(this);
     arrowNode.setEnabled(false);
@@ -149,20 +131,11 @@ public class AugmentedImageNode extends AnchorNode {
     arrowNode.setLocalPosition(new Vector3(0, 0.1f, 0.5f));
 //    arrowNode.setLookDirection(new Vector3(0, 0, -1));
 
-    rayNode = new DirectionalNode(false);
-    rayNode.setParent(this);
-    rayNode.setEnabled(false);
-    rayNode.setRenderable(rayRenderable);
-    // rayNode.setLookDirection(new Vector3(0, 1f, 0));
-//    rayNode.setLocalPosition(new Vector3(0, 0.5f, 0));
-
-
     for (ARObject arObject : arObjectList) {
       arObject.node = new DirectionalNode(true);
       arObject.node.setParent(this);
       arObject.node.setRenderable(arObject.renderable.getNow(null));
       arObject.node.setLocalPosition(arObject.position);
-      // arObject.node.setLookDirection(new Vector3(0, 1f, 0));
     }
 
     // Scale Y an extra 10 times to lower the maze wall.
