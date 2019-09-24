@@ -1,3 +1,0 @@
-The BWSS ARMap application doesn't record or store any information whatsoever.
-The camera permission is required because the Augmented Reality engine places the class room marker boards when the user
-scans the activator image. To be able to scan the image the engine (and thus the application) need to have access to the camera.

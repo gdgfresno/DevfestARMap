@@ -1,2 +1,2 @@
-# DevfestARMap
-Provide AR directional pins for the classrooms Valley Devfest
+# BWSS (Bitwise South Stadium) tARMap
+Privace Policy for BWSS ARMap
