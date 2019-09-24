@@ -2,4 +2,6 @@
 <resources>
   <string name="app_name">Valley Devfest AR Map</string>
   <string name="fit_image_to_scan">Fit image to scan</string>
+  <string name="ar_warning_title">Warning!!!</string>
+  <string name="ar_warning">While using this app please be aware of your surroundings, the augmented sign boards can overlay persons and obstacles! It is recommended that younger children have supervision when using Augmented Reality.</string>
 </resources>

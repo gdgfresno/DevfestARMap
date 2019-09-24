@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -63,6 +64,17 @@ public class AugmentedImageActivity extends AppCompatActivity {
       arFragment.onUpdate(frameTime);
       onUpdateFrame(frameTime);
     });
+
+    showARWarning();
+  }
+
+  private void showARWarning() {
+    AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.WarningDialogStyle);
+    String arWarning = getResources().getString(R.string.ar_warning);
+    String title = getResources().getString(R.string.ar_warning_title);
+    builder.setMessage(arWarning).setTitle(title).setPositiveButton("OK", null);
+    AlertDialog dialog = builder.create();
+    dialog.show();
   }
 
   @Override

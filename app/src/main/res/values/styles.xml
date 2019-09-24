@@ -30,4 +30,9 @@
     <!-- All customizations that are NOT specific to a particular API-level can go here. -->
   </style>
 
+  <style name="WarningDialogStyle" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:colorAccent">#ff0000</item>
+    <item name="android:textColor">#ff0000</item>
+    <item name="android:textColorPrimary">#ff0000</item>
+  </style>
 </resources>
