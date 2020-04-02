@@ -51,13 +51,22 @@ public class AugmentedImageFragment extends ArFragment {
   public void onAttach(Context context) {
     super.onAttach(context);
 
+    View contentView;
+    try {
+      contentView = getActivity().findViewById(android.R.id.content);
+    }
+    catch (NullPointerException e) {
+      Log.e(TAG, String.format("Cannot get content view %s", e.toString()));
+      return;
+    }
+
     // Check for Sceneform being supported on this device.  This check will be integrated into
     // Sceneform eventually.
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-      Log.e(TAG, "Sceneform requires Android N or later");
-      Snackbar.make(getActivity().findViewById(android.R.id.content),
-              "Sceneform requires Android N or later",
-              Snackbar.LENGTH_LONG).setAction("Action", null).show();
+      String androidVersionMessage = "Sceneform requires Android N or later";
+      Log.e(TAG, androidVersionMessage);
+      Snackbar.make(contentView, androidVersionMessage, Snackbar.LENGTH_LONG)
+              .setAction("Action", null).show();
     }
 
     String openGlVersionString =
@@ -65,10 +74,10 @@ public class AugmentedImageFragment extends ArFragment {
             .getDeviceConfigurationInfo()
             .getGlEsVersion();
     if (Double.parseDouble(openGlVersionString) < MIN_OPENGL_VERSION) {
-      Log.e(TAG, "Sceneform requires OpenGL ES 3.0 or later");
-      Snackbar.make(getActivity().findViewById(android.R.id.content),
-              "Sceneform requires OpenGL ES 3.0 or later",
-              Snackbar.LENGTH_LONG).setAction("Action", null).show();
+      String openGLCheckMessage = "Sceneform requires OpenGL ES 3.0 or later";
+      Log.e(TAG, openGLCheckMessage);
+      Snackbar.make(contentView, openGLCheckMessage, Snackbar.LENGTH_LONG)
+              .setAction("Action", null).show();
     }
   }
 
@@ -92,9 +101,14 @@ public class AugmentedImageFragment extends ArFragment {
     config.setFocusMode(Config.FocusMode.AUTO);
 
     if (!setupAugmentedImageDatabase(config, session)) {
-      Snackbar.make(getActivity().findViewById(android.R.id.content),
-              "Could not setup augmented image database",
-              Snackbar.LENGTH_LONG).setAction("Action", null).show();
+      try {
+        Snackbar.make(getActivity().findViewById(android.R.id.content),
+                "Could not setup augmented image database",
+                Snackbar.LENGTH_LONG).setAction("Action", null).show();
+      }
+      catch (NullPointerException e) {
+        Log.e(TAG, String.format("Cannot get content view %s", e.toString()));
+      }
     }
     return config;
   }
@@ -104,7 +118,7 @@ public class AugmentedImageFragment extends ArFragment {
 
     AssetManager assetManager = getContext() != null ? getContext().getAssets() : null;
     if (assetManager == null) {
-      Log.e(TAG, "Context is null, cannot intitialize image database.");
+      Log.e(TAG, "Context is null, cannot initialize image database.");
       return false;
     }
 
