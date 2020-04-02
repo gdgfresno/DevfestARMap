@@ -15,31 +15,28 @@
 package com.valleydevfest.armap;
 
 import android.content.Context;
-import android.net.Uri;
-import android.util.Log;
 
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.Color;
+import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
+import com.google.ar.sceneform.rendering.ShapeFactory;
 
 /**
  * Node for rendering an augmented image.
  */
-@SuppressWarnings({"AndroidApiChecker"})
-public class AugmentedImageNode extends AnchorNode {
-  class ARObject {
-    public String fileName;
-    public CompletableFuture<ModelRenderable> renderable;
-    public Node node;
-    public Vector3 position;
+class AugmentedImageNode extends AnchorNode {
+  static class ARObject {
+    String text;
+    ModelRenderable renderable;
+    Node node;
+    Vector3 position;
 
-    public ARObject(String fileName, Vector3 position) {
-      this.fileName = fileName;
+    ARObject(String text, Vector3 position) {
+      this.text = text;
       this.position = position;
     }
   }
@@ -51,19 +48,30 @@ public class AugmentedImageNode extends AnchorNode {
   // y: positive - behind, negative - forward
   // z: positive - down, negative - up
   private ARObject[] arObjectList = {
-    new ARObject("room1.sfb", new Vector3(2.5f, 2.0f, 1)),
-    new ARObject("room2.sfb", new Vector3(2.5f, -3.0f, 1)),
-    new ARObject("room3.sfb", new Vector3(-4.0f, -3.5f, 1)),
-    new ARObject("room4.sfb", new Vector3(-5.5f, -4.0f, 1)),
-    new ARObject("room5.sfb", new Vector3(-6.0f, -3.0f, 1)),
-    new ARObject("upstairs.sfb", new Vector3(3.5f, 8.0f, 1))
+          new ARObject("1", new Vector3(2.5f, 2.0f, 1)),
+          new ARObject("2", new Vector3(2.5f, -3.0f, 1)),
+          new ARObject("3", new Vector3(-4.0f, -3.5f, 1)),
+          new ARObject("4", new Vector3(-5.5f, -4.0f, 1)),
+          new ARObject("5", new Vector3(-6.0f, -3.0f, 1)),
+          new ARObject("up", new Vector3(3.5f, 8.0f, 1))
   };
 
-  public AugmentedImageNode(Context context) {
+  AugmentedImageNode(Context context) {
+//    MaterialFactory.makeOpaqueWithColor(context,
+//            new Color(android.graphics.Color.RED)).thenAccept(material -> {
+//      rayRenderable = ShapeFactory.makeCylinder(0.01f, 1.5f,
+//              new Vector3(0, 0, 0), material); });
+
     for (ARObject arObject : arObjectList) {
-      arObject.renderable = ModelRenderable.builder()
-              .setSource(context, Uri.parse(arObject.fileName))
-              .build();
+      MaterialFactory.makeOpaqueWithColor(context,
+        new Color(android.graphics.Color.BLUE)).thenAccept(material -> {
+          arObject.renderable = ShapeFactory.makeCube(
+            new Vector3(0.5f, 1, 0.01f),
+            new Vector3(0.0f, 0.0f, 0.0f),
+            material
+          );
+        });
+      // TODO: add numbers onto the billboard
     }
   }
 
@@ -72,28 +80,14 @@ public class AugmentedImageNode extends AnchorNode {
    * created based on an Anchor created from the image.
    */
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
-  public void setImage(AugmentedImage image) {
-    boolean allDone = Stream.of(arObjectList).allMatch(arObject -> arObject.renderable.isDone());
-    // If any of the models are not loaded, then recurse when all are loaded.
-    if (!allDone) {
-      CompletableFuture.allOf(arObjectList[0].renderable, arObjectList[1].renderable,
-              arObjectList[2].renderable, arObjectList[3].renderable,
-              arObjectList[4].renderable, arObjectList[5].renderable)
-          .thenAccept((Void aVoid) -> setImage(image))
-          .exceptionally(
-              throwable -> {
-                Log.e(TAG, "Exception loading", throwable);
-                return null;
-              });
-    }
-
+  void setImage(AugmentedImage image) {
     // Set the anchor based on the center of the image.
     setAnchor(image.createAnchor(image.getCenterPose()));
 
     for (ARObject arObject : arObjectList) {
       arObject.node = new BillBoardNode();
       arObject.node.setParent(this);
-      arObject.node.setRenderable(arObject.renderable.getNow(null));
+      arObject.node.setRenderable(arObject.renderable);
       arObject.node.setLocalPosition(arObject.position);
     }
   }
