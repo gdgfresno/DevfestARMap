@@ -46,7 +46,6 @@ public class AugmentedImageActivity extends AppCompatActivity {
 
   private ArFragment arFragment;
   private ImageView fitToScanView;
-  private AugmentedImageNode augmentedImageNode;
 
   // Augmented image and its associated center pose anchor, keyed by the augmented image in
   // the database.
@@ -117,7 +116,7 @@ public class AugmentedImageActivity extends AppCompatActivity {
 
           // Create a new anchor for newly found images.
           if (!augmentedImageMap.containsKey(augmentedImage)) {
-            augmentedImageNode = new AugmentedImageNode(this);
+            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(this);
             augmentedImageNode.setImage(augmentedImage);
             augmentedImageMap.put(augmentedImage, augmentedImageNode);
             arFragment.getArSceneView().getScene().addChild(augmentedImageNode);

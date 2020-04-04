@@ -31,14 +31,14 @@ import java.util.stream.Stream;
  * Node for rendering an augmented image.
  */
 @SuppressWarnings({"AndroidApiChecker"})
-public class AugmentedImageNode extends AnchorNode {
+class AugmentedImageNode extends AnchorNode {
   class ARObject {
-    public String fileName;
-    public CompletableFuture<ModelRenderable> renderable;
-    public Node node;
-    public Vector3 position;
+    String fileName;
+    CompletableFuture<ModelRenderable> renderable;
+    Node node;
+    Vector3 position;
 
-    public ARObject(String fileName, Vector3 position) {
+    ARObject(String fileName, Vector3 position) {
       this.fileName = fileName;
       this.position = position;
     }
@@ -59,7 +59,7 @@ public class AugmentedImageNode extends AnchorNode {
     new ARObject("upstairs.sfb", new Vector3(3.5f, 8.0f, 1))
   };
 
-  public AugmentedImageNode(Context context) {
+  AugmentedImageNode(Context context) {
     for (ARObject arObject : arObjectList) {
       arObject.renderable = ModelRenderable.builder()
               .setSource(context, Uri.parse(arObject.fileName))
@@ -72,7 +72,7 @@ public class AugmentedImageNode extends AnchorNode {
    * created based on an Anchor created from the image.
    */
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
-  public void setImage(AugmentedImage image) {
+  void setImage(AugmentedImage image) {
     boolean allDone = Stream.of(arObjectList).allMatch(arObject -> arObject.renderable.isDone());
     // If any of the models are not loaded, then recurse when all are loaded.
     if (!allDone) {
