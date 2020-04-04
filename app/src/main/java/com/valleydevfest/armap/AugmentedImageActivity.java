@@ -22,8 +22,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
 import com.google.ar.core.Frame;
+import com.google.ar.core.Session;
+import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.ux.ArFragment;
 import java.util.Collection;
@@ -116,10 +119,13 @@ public class AugmentedImageActivity extends AppCompatActivity {
 
           // Create a new anchor for newly found images.
           if (!augmentedImageMap.containsKey(augmentedImage)) {
-            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(this);
-            augmentedImageNode.setImage(augmentedImage);
+            ArSceneView arSceneView = arFragment.getArSceneView();
+            Session session = arSceneView.getSession();
+            Anchor anchor = session.createAnchor(augmentedImage.getCenterPose());
+
+            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, this);
+            augmentedImageNode.populateScene();
             augmentedImageMap.put(augmentedImage, augmentedImageNode);
-            arFragment.getArSceneView().getScene().addChild(augmentedImageNode);
           }
           break;
 
