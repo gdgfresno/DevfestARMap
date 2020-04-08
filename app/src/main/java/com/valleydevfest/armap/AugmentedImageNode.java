@@ -21,55 +21,81 @@ import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
+import com.google.ar.sceneform.rendering.Texture;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 /**
  * Node for rendering an augmented image.
  */
 class AugmentedImageNode extends AnchorNode {
-  static class ARObject {
-    String text;
+  class ARObject {
+    int resourceId;
+    CompletableFuture<Texture> texture;
+    CompletableFuture<Material> material;
     ModelRenderable renderable;
     Node node;
     Vector3 position;
 
-    ARObject(String text, Vector3 position) {
-      this.text = text;
+    ARObject(int resourceId, Vector3 position) {
+      this.resourceId = resourceId;
       this.position = position;
+    }
+
+    void setTexture(CompletableFuture<Texture> texture) {
+      this.texture = texture;
+    }
+
+    CompletableFuture<Texture> getTexture() {
+      return texture;
+    }
+
+    void setMaterial(CompletableFuture<Material> material) {
+      this.material = material;
+    }
+
+    CompletableFuture<Material> getMaterial() {
+      return material;
     }
   }
 
   private static final String TAG = "AugmentedImageNode";
   private CompletableFuture<Material> redMaterialFuture;
-  private CompletableFuture<Material> whiteMaterialFuture;
 
   // Coordinates:
   // x: positive - right, negative - left
   // y: positive - behind, negative - forward
   // z: positive - down, negative - up
   private ARObject[] arObjectList = {
-    new ARObject("1", new Vector3(2.5f, 2.0f, 1)),
-    new ARObject("2", new Vector3(2.5f, -3.0f, 1)),
-    new ARObject("3", new Vector3(-4.0f, -3.5f, 1)),
-    new ARObject("4", new Vector3(-5.5f, -4.0f, 1)),
-    new ARObject("5", new Vector3(-6.0f, -3.0f, 1)),
-    new ARObject("up", new Vector3(3.5f, 8.0f, 1))
+    new ARObject(R.drawable.room1, new Vector3(2.5f, 2.0f, 1)),
+    new ARObject(R.drawable.room2, new Vector3(2.5f, -3.0f, 1)),
+    new ARObject(R.drawable.room3, new Vector3(-4.0f, -3.5f, 1)),
+    new ARObject(R.drawable.room4, new Vector3(-5.5f, -4.0f, 1)),
+    new ARObject(R.drawable.room5, new Vector3(-6.0f, -3.0f, 1)),
+    new ARObject(R.drawable.upstairs, new Vector3(3.5f, 8.0f, 1))
   };
 
   AugmentedImageNode(Anchor anchor, Context context) {
     super(anchor);
 
-    Color red = new Color(android.graphics.Color.RED);
-    redMaterialFuture = MaterialFactory.makeOpaqueWithColor(context, red);
-    Color white = new Color(android.graphics.Color.WHITE);
-    whiteMaterialFuture = MaterialFactory.makeOpaqueWithColor(context, white);
+    for (ARObject arObject : arObjectList) {
+      Texture.Builder textureBuilder = Texture.builder();
+      textureBuilder.setSource(context, arObject.resourceId);
+      CompletableFuture<Texture> texturePromise = textureBuilder.build();
+      arObject.setTexture(texturePromise);
+      texturePromise.thenAccept(texture -> {
+        CompletableFuture<Material> materialPromise =
+                MaterialFactory.makeOpaqueWithTexture(context, texture);
+        arObject.setMaterial(materialPromise);
+      });
+    }
+
   }
 
   /**
@@ -78,10 +104,27 @@ class AugmentedImageNode extends AnchorNode {
    */
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
   void populateScene() {
-    boolean allDone = redMaterialFuture.isDone() && whiteMaterialFuture.isDone();
-    // If any of the models are not loaded, then recurse when all are loaded.
-    if (!allDone) {
-      CompletableFuture.allOf(redMaterialFuture, whiteMaterialFuture)
+    boolean texturesDone = Stream.of(arObjectList).allMatch(arObject -> arObject.getTexture().isDone());
+    // If any of the textures are not loaded, then recurse until all are loaded.
+    if (!texturesDone) {
+      CompletableFuture.allOf(
+              arObjectList[0].getTexture(), arObjectList[1].getTexture(),
+              arObjectList[2].getTexture(), arObjectList[3].getTexture(),
+              arObjectList[4].getTexture(), arObjectList[5].getTexture())
+        .thenAccept((Void aVoid) -> populateScene())
+        .exceptionally(
+          throwable -> {
+            Log.e(TAG, "Exception building scene", throwable);
+            return null;
+          });
+    }
+
+    boolean materialsDone = Stream.of(arObjectList).allMatch(arObject -> arObject.getMaterial().isDone());
+    if (!materialsDone) {
+      CompletableFuture.allOf(
+            arObjectList[0].getMaterial(), arObjectList[1].getMaterial(),
+            arObjectList[2].getMaterial(), arObjectList[3].getMaterial(),
+            arObjectList[4].getMaterial(), arObjectList[5].getMaterial())
         .thenAccept((Void aVoid) -> populateScene())
         .exceptionally(
           throwable -> {
@@ -91,22 +134,13 @@ class AugmentedImageNode extends AnchorNode {
     }
 
     try {
-      Material redMaterial = redMaterialFuture.get();
-      Material whiteMaterial = whiteMaterialFuture.get();
-
       for (ARObject arObject : arObjectList) {
-        arObject.renderable = ShapeFactory.makeCube(
-                new Vector3(0.5f, 1, 0.01f),
-                new Vector3(0.0f, 0.0f, 0.0f),
-                redMaterial
-        );
+        Material textureMaterial = arObject.getMaterial().get();
 
-        // TODO: add numbers onto the billboard
-        arObject.renderable = ShapeFactory.makeCylinder(
-                0.5f,
-                0.5f,
-                new Vector3(0, 0, 0),
-                whiteMaterial
+        arObject.renderable = ShapeFactory.makeCube(
+          new Vector3(0.5f, 1, 0.01f),
+          new Vector3(0.0f, 0.0f, 0.0f),
+          textureMaterial
         );
 
         arObject.node = new BillBoardNode();
