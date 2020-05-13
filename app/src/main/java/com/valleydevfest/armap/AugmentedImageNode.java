@@ -71,9 +71,7 @@ class AugmentedImageNode extends AnchorNode {
 //    final Texture.Sampler sampler = Texture.Sampler.builder()
 //      .setMinFilter(Texture.Sampler.MinFilter.LINEAR_MIPMAP_LINEAR)
 //      .setMagFilter(Texture.Sampler.MagFilter.LINEAR)
-//      .setWrapModeR(Texture.Sampler.WrapMode.CLAMP_TO_EDGE)
-//      .setWrapModeS(Texture.Sampler.WrapMode.CLAMP_TO_EDGE)
-//      .setWrapModeT(Texture.Sampler.WrapMode.CLAMP_TO_EDGE)
+//      .setWrapMode(Texture.Sampler.WrapMode.REPEAT)
 //      .build();
 
     for (ARObject arObject : arObjectList) {
