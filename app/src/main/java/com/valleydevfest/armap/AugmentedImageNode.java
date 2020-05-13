@@ -15,7 +15,6 @@
 package com.valleydevfest.armap;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 
 import com.google.ar.core.Anchor;
@@ -38,7 +37,6 @@ import java.util.stream.Stream;
  * Node for basically the whole scene.
  */
 class AugmentedImageNode extends AnchorNode {
-  // Context context;
 
   class ARObject {
     int resourceId;
@@ -81,33 +79,6 @@ class AugmentedImageNode extends AnchorNode {
 
   private static final String TAG = "AugmentedImageNode";
 
-//  class RunnableShapeBuilder implements Runnable {
-//    ARObject arObject;
-//    AnchorNode parentNode;
-//    Material textureMaterial;
-//
-//    RunnableShapeBuilder(ARObject arObject, AnchorNode parentNode, Material textureMaterial) {
-//      this.arObject = arObject;
-//      this.parentNode = parentNode;
-//      this.textureMaterial = textureMaterial;
-//    }
-//
-//    @Override
-//    public void run() {
-//      arObject.renderable = ShapeFactory.makeCube(
-//        new Vector3(0.5f, 1, 0.01f),
-//        new Vector3(0.0f, 0.0f, 0.0f),
-//        textureMaterial
-//      );
-//
-//      arObject.node = new BillBoardNode();
-//      arObject.node.setParent(parentNode);
-//      arObject.node.setRenderable(arObject.renderable);
-//      arObject.node.setLocalPosition(arObject.position);
-//      arObject.setDone(true);
-//    }
-//  }
-
   // Coordinates:
   // x: positive - right, negative - left
   // y: positive - behind, negative - forward
@@ -142,15 +113,11 @@ class AugmentedImageNode extends AnchorNode {
   private void afterMaterialsLoaded() {
     // Step 3: composing scene objects
     // Get a handler that can be used to post to the main thread
-//    Handler mainHandler = new Handler(context.getMainLooper());
     Log.d(TAG, "Making cubes...");
     for (ARObject arObject : arObjectList) {
       try {
         Material textureMaterial = arObject.getMaterial().get();
         Log.d(TAG, String.format("Making cube for %d %s %s", arObject.resourceId, Integer.toHexString(System.identityHashCode(arObject.getMaterial())), Integer.toHexString(System.identityHashCode(arObject.getTexture()))));
-
-//        RunnableShapeBuilder shapeBuilder = new RunnableShapeBuilder(arObject, this, textureMaterial);
-//        mainHandler.post(shapeBuilder);
       }
       catch (ExecutionException | InterruptedException e) {
         Log.e(TAG, "Scene populating exception " + e.toString());
