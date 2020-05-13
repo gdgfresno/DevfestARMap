@@ -83,46 +83,24 @@ class AugmentedImageNode extends AnchorNode {
 //      .build();
 
     for (ARObject arObject : arObjectList) {
-//      Texture.builder()
-//        .setSource(context, arObject.resourceId)
+      Texture.builder()
+        .setSource(context, arObject.resourceId)
 //        .setSampler(sampler)
-//        .build()
-//        .thenAccept(texture -> MaterialFactory.makeOpaqueWithTexture(context, texture)
-//          .thenAccept(material -> {
-//            arObject.renderable = ShapeFactory.makeCube(
-//              new Vector3(0.5f, 1, 0.01f),
-//              new Vector3(0.0f, 0.0f, 0.0f),
-//              material
-//            );
-//
-//            arObject.node = new BillBoardNode();
-//            arObject.node.setParent(this);
-//            arObject.node.setRenderable(arObject.renderable);
-//            arObject.node.setLocalPosition(arObject.position);
-//          })
-//        );
+        .build()
+        .thenAccept(texture -> MaterialFactory.makeOpaqueWithTexture(context, texture)
+          .thenAccept(material -> {
+            ModelRenderable renderable = ShapeFactory.makeCube(
+              new Vector3(2, 4, 0.01f),
+              new Vector3(0.0f, 0.0f, 0.0f),
+              material
+            );
 
-      MaterialFactory.makeOpaqueWithColor(context, new Color(android.graphics.Color.RED)).thenAccept(material -> {
-        ModelRenderable renderable = ShapeFactory.makeCube(
-          new Vector3(0.5f, 1, 0.01f),
-          new Vector3(0.0f, 0.0f, 0.0f),
-          material
+            arObject.node = new BillBoardNode();
+            arObject.node.setParent(this);
+            arObject.node.setRenderable(renderable);
+            arObject.node.setLocalPosition(arObject.position);
+          })
         );
-
-        arObject.node = new BillBoardNode();
-        arObject.node.setParent(this);
-        arObject.node.setRenderable(renderable);
-        arObject.node.setLocalPosition(arObject.position);
-//        arObject.node.setEnabled(true);
-        Log.d(TAG, String.format("ARObj: %s n %s p %s %s s %s r %s",
-                arObject.node.isActive() ? "active" : "inactive",
-                arObject.node.getName(),
-                Integer.toHexString(System.identityHashCode(arObject.node.getParent().getName())),
-                Integer.toHexString(System.identityHashCode(arObject.node.getParent())),
-                Integer.toHexString(System.identityHashCode(arObject.node.getScene())),
-                Integer.toHexString(System.identityHashCode(arObject.node.getRenderable()))
-        ));
-      });
     }
   }
 }
