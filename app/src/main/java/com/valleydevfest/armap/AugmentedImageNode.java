@@ -21,7 +21,9 @@ import android.util.Log;
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Vector3;
+import com.google.ar.sceneform.rendering.Color;
 import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
@@ -36,10 +38,11 @@ import java.util.stream.Stream;
  * Node for basically the whole scene.
  */
 class AugmentedImageNode extends AnchorNode {
-  Context context;
+  // Context context;
 
   class ARObject {
     int resourceId;
+    String fileName;
     CompletableFuture<Texture> texture;
     CompletableFuture<Material> material;
     ModelRenderable renderable;
@@ -47,8 +50,9 @@ class AugmentedImageNode extends AnchorNode {
     Vector3 position;
     boolean done;
 
-    ARObject(int resourceId, Vector3 position) {
+    ARObject(int resourceId, String fileName, Vector3 position) {
       this.resourceId = resourceId;
+      this.fileName = fileName;
       this.position = position;
     }
 
@@ -77,76 +81,76 @@ class AugmentedImageNode extends AnchorNode {
 
   private static final String TAG = "AugmentedImageNode";
 
-  class RunnableShapeBuilder implements Runnable {
-    ARObject arObject;
-    AnchorNode parentNode;
-    Material textureMaterial;
-
-    RunnableShapeBuilder(ARObject arObject, AnchorNode parentNode, Material textureMaterial) {
-      this.arObject = arObject;
-      this.parentNode = parentNode;
-      this.textureMaterial = textureMaterial;
-    }
-
-    @Override
-    public void run() {
-      arObject.renderable = ShapeFactory.makeCube(
-        new Vector3(0.5f, 1, 0.01f),
-        new Vector3(0.0f, 0.0f, 0.0f),
-        textureMaterial
-      );
-
-      arObject.node = new BillBoardNode();
-      arObject.node.setParent(parentNode);
-      arObject.node.setRenderable(arObject.renderable);
-      arObject.node.setLocalPosition(arObject.position);
-      arObject.setDone(true);
-    }
-  }
+//  class RunnableShapeBuilder implements Runnable {
+//    ARObject arObject;
+//    AnchorNode parentNode;
+//    Material textureMaterial;
+//
+//    RunnableShapeBuilder(ARObject arObject, AnchorNode parentNode, Material textureMaterial) {
+//      this.arObject = arObject;
+//      this.parentNode = parentNode;
+//      this.textureMaterial = textureMaterial;
+//    }
+//
+//    @Override
+//    public void run() {
+//      arObject.renderable = ShapeFactory.makeCube(
+//        new Vector3(0.5f, 1, 0.01f),
+//        new Vector3(0.0f, 0.0f, 0.0f),
+//        textureMaterial
+//      );
+//
+//      arObject.node = new BillBoardNode();
+//      arObject.node.setParent(parentNode);
+//      arObject.node.setRenderable(arObject.renderable);
+//      arObject.node.setLocalPosition(arObject.position);
+//      arObject.setDone(true);
+//    }
+//  }
 
   // Coordinates:
   // x: positive - right, negative - left
   // y: positive - behind, negative - forward
   // z: positive - down, negative - up
   private ARObject[] arObjectList = {
-    new ARObject(R.drawable.room1, new Vector3(2.5f, 2.0f, 1)),
-    new ARObject(R.drawable.room2, new Vector3(2.5f, -3.0f, 1)),
-    new ARObject(R.drawable.room3, new Vector3(-4.0f, -3.5f, 1)),
-    new ARObject(R.drawable.room4, new Vector3(-5.5f, -4.0f, 1)),
-    new ARObject(R.drawable.room5, new Vector3(-6.0f, -3.0f, 1)),
-    new ARObject(R.drawable.upstairs, new Vector3(3.5f, 8.0f, 1))
+    new ARObject(R.drawable.room1, "room1.png", new Vector3(2.5f, 2.0f, 1)),
+    new ARObject(R.drawable.room2, "room2.png", new Vector3(2.5f, -3.0f, 1)),
+    new ARObject(R.drawable.room3, "room3.png", new Vector3(-4.0f, -3.5f, 1)),
+    new ARObject(R.drawable.room4, "room4.png", new Vector3(-5.5f, -4.0f, 1)),
+    new ARObject(R.drawable.room5, "room5.png", new Vector3(-6.0f, -3.0f, 1)),
+    new ARObject(R.drawable.upstairs, "upstairs.png", new Vector3(3.5f, 8.0f, 1))
   };
 
-  AugmentedImageNode(Anchor anchor, Context context) {
+  AugmentedImageNode(Anchor anchor, Scene scene) {
     super(anchor);
 
-    this.context = context;
+    setParent(scene);
 
-    for (ARObject arObject : arObjectList) {
-      Texture.Builder textureBuilder = Texture.builder();
-      textureBuilder.setSource(context, arObject.resourceId);
-      CompletableFuture<Texture> texturePromise = textureBuilder.build();
-      arObject.setTexture(texturePromise);
-      texturePromise.thenAccept(texture -> {
-        CompletableFuture<Material> materialPromise =
-                MaterialFactory.makeOpaqueWithTexture(context, texture);
-        arObject.setMaterial(materialPromise);
-      });
-    }
+//    for (ARObject arObject : arObjectList) {
+//      Texture.Builder textureBuilder = Texture.builder();
+//      textureBuilder.setSource(context, arObject.resourceId);
+//      CompletableFuture<Texture> texturePromise = textureBuilder.build();
+//      arObject.setTexture(texturePromise);
+//      texturePromise.thenAccept(texture -> {
+//        CompletableFuture<Material> materialPromise =
+//                MaterialFactory.makeOpaqueWithTexture(context, texture);
+//        arObject.setMaterial(materialPromise);
+//      });
+//    }
   }
 
   private void afterMaterialsLoaded() {
     // Step 3: composing scene objects
     // Get a handler that can be used to post to the main thread
-    Handler mainHandler = new Handler(context.getMainLooper());
+//    Handler mainHandler = new Handler(context.getMainLooper());
     Log.d(TAG, "Making cubes...");
     for (ARObject arObject : arObjectList) {
       try {
         Material textureMaterial = arObject.getMaterial().get();
         Log.d(TAG, String.format("Making cube for %d %s %s", arObject.resourceId, Integer.toHexString(System.identityHashCode(arObject.getMaterial())), Integer.toHexString(System.identityHashCode(arObject.getTexture()))));
 
-        RunnableShapeBuilder shapeBuilder = new RunnableShapeBuilder(arObject, this, textureMaterial);
-        mainHandler.post(shapeBuilder);
+//        RunnableShapeBuilder shapeBuilder = new RunnableShapeBuilder(arObject, this, textureMaterial);
+//        mainHandler.post(shapeBuilder);
       }
       catch (ExecutionException | InterruptedException e) {
         Log.e(TAG, "Scene populating exception " + e.toString());
@@ -167,7 +171,7 @@ class AugmentedImageNode extends AnchorNode {
   private void afterTexturesSet() {
     boolean materialsDone = Stream.of(arObjectList).allMatch(arObject -> arObject.getMaterial() != null && arObject.getMaterial().isDone());
     // If any of the materials are not loaded, then recurse until all are loaded.
-    Log.d(TAG, String.format("materialsDone %b", materialsDone));
+    Log.d(TAG, String.format("materialsDone %s", materialsDone ? "true" : "false"));
     if (!materialsDone) {
       CompletableFuture<Texture>[] materialPromises =
         Stream.of(arObjectList).map(ARObject::getMaterial).toArray(CompletableFuture[]::new);
@@ -201,11 +205,75 @@ class AugmentedImageNode extends AnchorNode {
    * created based on an Anchor created from the image.
    */
   @SuppressWarnings({"AndroidApiChecker", "FutureReturnValueIgnored"})
-  void populateScene() {
+  void populateScene(Context context) {
+//    final Texture.Sampler sampler = Texture.Sampler.builder()
+//      .setMinFilter(Texture.Sampler.MinFilter.LINEAR_MIPMAP_LINEAR)
+//      .setMagFilter(Texture.Sampler.MagFilter.LINEAR)
+//      .setWrapModeR(Texture.Sampler.WrapMode.CLAMP_TO_EDGE)
+//      .setWrapModeS(Texture.Sampler.WrapMode.CLAMP_TO_EDGE)
+//      .setWrapModeT(Texture.Sampler.WrapMode.CLAMP_TO_EDGE)
+//      .build();
+
+    for (ARObject arObject : arObjectList) {
+//      Texture.builder()
+//        .setSource(context, arObject.resourceId)
+//        .setSampler(sampler)
+//        .build()
+//        .thenAccept(texture -> MaterialFactory.makeOpaqueWithTexture(context, texture)
+//          .thenAccept(material -> {
+//            arObject.renderable = ShapeFactory.makeCube(
+//              new Vector3(0.5f, 1, 0.01f),
+//              new Vector3(0.0f, 0.0f, 0.0f),
+//              material
+//            );
+//
+//            arObject.node = new BillBoardNode();
+//            arObject.node.setParent(this);
+//            arObject.node.setRenderable(arObject.renderable);
+//            arObject.node.setLocalPosition(arObject.position);
+//          })
+//        );
+
+      MaterialFactory.makeOpaqueWithColor(context, new Color(android.graphics.Color.RED)).thenAccept(material -> {
+        arObject.renderable = ShapeFactory.makeCube(
+          new Vector3(0.5f, 1, 0.01f),
+          new Vector3(0.0f, 0.0f, 0.0f),
+          material
+        );
+
+        arObject.node = new BillBoardNode();
+        arObject.node.setParent(this);
+        arObject.node.setRenderable(arObject.renderable);
+        arObject.node.setLocalPosition(arObject.position);
+        arObject.node.setEnabled(true);
+        Log.d(TAG, String.format("ARObj: %s n %s p %s %s s %s r %s",
+                arObject.node.isActive() ? "active" : "inactive",
+                arObject.node.getName(),
+                Integer.toHexString(System.identityHashCode(arObject.node.getParent().getName())),
+                Integer.toHexString(System.identityHashCode(arObject.node.getParent())),
+                Integer.toHexString(System.identityHashCode(arObject.node.getScene())),
+                Integer.toHexString(System.identityHashCode(arObject.node.getRenderable()))
+        ));
+      });
+
+      /*
+      Texture.Builder textureBuilder = Texture.builder();
+      textureBuilder.setSource(context, arObject.resourceId);
+      CompletableFuture<Texture> texturePromise = textureBuilder.build();
+      arObject.setTexture(texturePromise);
+      texturePromise.thenAccept(texture -> {
+        CompletableFuture<Material> materialPromise =
+                MaterialFactory.makeOpaqueWithTexture(context, texture);
+        arObject.setMaterial(materialPromise);
+      });
+      */
+    }
+
+    /*
     // Step 1: texture loading
     boolean texturesDone = Stream.of(arObjectList).allMatch(arObject -> arObject.getTexture() != null && arObject.getTexture().isDone());
     // If any of the textures are not loaded, then recurse until all are loaded.
-    Log.d(TAG, String.format("texturesDone %b", texturesDone));
+    Log.d(TAG, String.format("texturesDone %s", texturesDone ? "true" : "false"));
     if (!texturesDone) {
       CompletableFuture<Texture>[] texturePromises =
         Stream.of(arObjectList).map(ARObject::getTexture).toArray(CompletableFuture[]::new);
@@ -220,5 +288,6 @@ class AugmentedImageNode extends AnchorNode {
     } else {
       afterTexturesLoaded();
     }
+    */
   }
 }

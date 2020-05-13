@@ -121,10 +121,10 @@ public class AugmentedImageActivity extends AppCompatActivity {
           if (!augmentedImageMap.containsKey(augmentedImage)) {
             ArSceneView arSceneView = arFragment.getArSceneView();
             Session session = arSceneView.getSession();
+            assert session != null;
             Anchor anchor = session.createAnchor(augmentedImage.getCenterPose());
-
-            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, this);
-            augmentedImageNode.populateScene();
+            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, arSceneView.getScene());
+            augmentedImageNode.populateScene(this);
             augmentedImageMap.put(augmentedImage, augmentedImageNode);
           }
           break;
