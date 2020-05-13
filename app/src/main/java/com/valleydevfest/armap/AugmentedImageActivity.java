@@ -28,6 +28,8 @@ import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
+import com.google.ar.sceneform.Node;
+import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.ux.ArFragment;
 import java.util.Collection;
 import java.util.HashMap;
@@ -123,7 +125,12 @@ public class AugmentedImageActivity extends AppCompatActivity {
             Session session = arSceneView.getSession();
             assert session != null;
             Anchor anchor = session.createAnchor(augmentedImage.getCenterPose());
-            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, arSceneView.getScene());
+            Scene scene = arSceneView.getScene();
+            Node sunLight = scene.getSunlight();
+            if (sunLight != null) {
+                sunLight.setEnabled(false);
+            }
+            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, scene);
             augmentedImageNode.populateScene(this);
             augmentedImageMap.put(augmentedImage, augmentedImageNode);
           }
