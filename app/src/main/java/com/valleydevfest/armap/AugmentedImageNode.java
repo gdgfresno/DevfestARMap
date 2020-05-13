@@ -15,15 +15,12 @@
 package com.valleydevfest.armap;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.google.ar.core.Anchor;
 import com.google.ar.sceneform.AnchorNode;
 import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.math.Vector3;
-import com.google.ar.sceneform.rendering.Color;
-import com.google.ar.sceneform.rendering.Material;
 import com.google.ar.sceneform.rendering.MaterialFactory;
 import com.google.ar.sceneform.rendering.ModelRenderable;
 import com.google.ar.sceneform.rendering.ShapeFactory;
@@ -36,13 +33,10 @@ class AugmentedImageNode extends AnchorNode {
 
   class ARObject {
     int resourceId;
-    String fileName;
-    Node node;
     Vector3 position;
 
-    ARObject(int resourceId, String fileName, Vector3 position) {
+    ARObject(int resourceId, Vector3 position) {
       this.resourceId = resourceId;
-      this.fileName = fileName;
       this.position = position;
     }
   }
@@ -54,12 +48,12 @@ class AugmentedImageNode extends AnchorNode {
   // y: positive - behind, negative - forward
   // z: positive - down, negative - up
   private ARObject[] arObjectList = {
-    new ARObject(R.drawable.room1, "room1.png", new Vector3(2.5f, 2.0f, 1)),
-    new ARObject(R.drawable.room2, "room2.png", new Vector3(2.5f, -3.0f, 1)),
-    new ARObject(R.drawable.room3, "room3.png", new Vector3(-4.0f, -3.5f, 1)),
-    new ARObject(R.drawable.room4, "room4.png", new Vector3(-5.5f, -4.0f, 1)),
-    new ARObject(R.drawable.room5, "room5.png", new Vector3(-6.0f, -3.0f, 1)),
-    new ARObject(R.drawable.upstairs, "upstairs.png", new Vector3(3.5f, 8.0f, 1))
+    new ARObject(R.drawable.room1, new Vector3(2.5f, 2.0f, 1)),
+    new ARObject(R.drawable.room2, new Vector3(2.5f, -3.0f, 1)),
+    new ARObject(R.drawable.room3, new Vector3(-4.0f, -3.5f, 1)),
+    new ARObject(R.drawable.room4, new Vector3(-5.5f, -4.0f, 1)),
+    new ARObject(R.drawable.room5, new Vector3(-6.0f, -3.0f, 1)),
+    new ARObject(R.drawable.upstairs, new Vector3(3.5f, 8.0f, 1))
   };
 
   AugmentedImageNode(Anchor anchor, Scene scene) {
@@ -95,10 +89,10 @@ class AugmentedImageNode extends AnchorNode {
               material
             );
 
-            arObject.node = new BillBoardNode();
-            arObject.node.setParent(this);
-            arObject.node.setRenderable(renderable);
-            arObject.node.setLocalPosition(arObject.position);
+            Node node = new BillBoardNode();
+            node.setParent(this);
+            node.setRenderable(renderable);
+            node.setLocalPosition(arObject.position);
           })
         );
     }
