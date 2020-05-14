@@ -126,13 +126,14 @@ public class AugmentedImageActivity extends AppCompatActivity {
             assert session != null;
             Anchor anchor = session.createAnchor(augmentedImage.getCenterPose());
             Scene scene = arSceneView.getScene();
-            Node sunLight = scene.getSunlight();
-            if (sunLight != null) {
-                sunLight.setEnabled(false);
-            }
             AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, scene);
             augmentedImageNode.populateScene(this);
             augmentedImageMap.put(augmentedImage, augmentedImageNode);
+            Node sunLight = scene.getSunlight();
+            if (sunLight != null) {
+              sunLight.setEnabled(false);
+            }
+            arSceneView.getPlaneRenderer().setShadowReceiver(false);
           }
           break;
 
