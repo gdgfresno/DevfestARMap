@@ -100,6 +100,8 @@ public class AugmentedImageFragment extends ArFragment {
     // Use setFocusMode to configure auto-focus.
     config.setFocusMode(Config.FocusMode.AUTO);
 
+    config.setLightEstimationMode(Config.LightEstimationMode.DISABLED);
+
     if (!setupAugmentedImageDatabase(config, session)) {
       try {
         Snackbar.make(getActivity().findViewById(android.R.id.content),
