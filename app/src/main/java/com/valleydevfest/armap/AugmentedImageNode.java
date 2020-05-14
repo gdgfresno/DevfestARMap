@@ -86,6 +86,8 @@ class AugmentedImageNode extends AnchorNode {
               new Vector3(0.0f, 0.0f, 0.0f),
               material
             );
+            renderable.setShadowCaster(false);
+            renderable.setShadowReceiver(false);
 
             Node node = new BillBoardNode();
             node.setParent(this);
