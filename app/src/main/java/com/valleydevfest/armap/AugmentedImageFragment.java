@@ -24,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -48,26 +49,10 @@ public class AugmentedImageFragment extends ArFragment {
   private static final double MIN_OPENGL_VERSION = 3.0;
 
   @Override
-  public void onAttach(Context context) {
+  public void onAttach(@NonNull Context context) {
     super.onAttach(context);
 
-    View contentView;
-    try {
-      contentView = getActivity().findViewById(android.R.id.content);
-    }
-    catch (NullPointerException e) {
-      Log.e(TAG, String.format("Cannot get content view %s", e.toString()));
-      return;
-    }
-
-    // Check for Sceneform being supported on this device.  This check will be integrated into
-    // Sceneform eventually.
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-      String androidVersionMessage = "Sceneform requires Android N or later";
-      Log.e(TAG, androidVersionMessage);
-      Snackbar.make(contentView, androidVersionMessage, Snackbar.LENGTH_LONG)
-              .setAction("Action", null).show();
-    }
+    View contentView = requireActivity().findViewById(android.R.id.content);
 
     String openGlVersionString =
         ((ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE))
@@ -104,7 +89,7 @@ public class AugmentedImageFragment extends ArFragment {
 
     if (!setupAugmentedImageDatabase(config, session)) {
       try {
-        Snackbar.make(getActivity().findViewById(android.R.id.content),
+        Snackbar.make(requireActivity().findViewById(android.R.id.content),
                 "Could not setup augmented image database",
                 Snackbar.LENGTH_LONG).setAction("Action", null).show();
       }
