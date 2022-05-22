@@ -35,6 +35,7 @@ android {
                     'proguard-rules.pro'
         }
     }
+    namespace 'com.valleydevfest.armap'
 }
 
 dependencies {
