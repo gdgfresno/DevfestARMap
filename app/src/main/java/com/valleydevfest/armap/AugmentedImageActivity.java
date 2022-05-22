@@ -28,7 +28,6 @@ import com.google.ar.core.Frame;
 import com.google.ar.core.Session;
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.FrameTime;
-import com.google.ar.sceneform.Node;
 import com.google.ar.sceneform.Scene;
 import com.google.ar.sceneform.ux.ArFragment;
 import java.util.Collection;
@@ -129,10 +128,6 @@ public class AugmentedImageActivity extends AppCompatActivity {
             AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, scene);
             augmentedImageNode.populateScene(this);
             augmentedImageMap.put(augmentedImage, augmentedImageNode);
-            Node sunLight = scene.getSunlight();
-            if (sunLight != null) {
-              sunLight.setEnabled(false);
-            }
             arSceneView.getPlaneRenderer().setShadowReceiver(false);
           }
           break;

@@ -72,8 +72,8 @@ public class AugmentedImageFragment extends ArFragment {
     View view = super.onCreateView(inflater, container, savedInstanceState);
 
     // Turn off the plane discovery since we're only looking for images
-    getPlaneDiscoveryController().hide();
-    getPlaneDiscoveryController().setInstructionView(null);
+    getInstructionsController().setEnabled(false);
+    getInstructionsController().setVisible(false);
     getArSceneView().getPlaneRenderer().setEnabled(false);
     return view;
   }
