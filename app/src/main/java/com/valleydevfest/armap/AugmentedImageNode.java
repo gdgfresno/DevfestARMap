@@ -31,7 +31,7 @@ import com.google.ar.sceneform.rendering.Texture;
  */
 class AugmentedImageNode extends AnchorNode {
 
-  class ARObject {
+  static class ARObject {
     int resourceId;
     Vector3 position;
 
@@ -47,13 +47,13 @@ class AugmentedImageNode extends AnchorNode {
   // x: positive - right, negative - left
   // y: positive - behind, negative - forward
   // z: positive - down, negative - up
-  private ARObject[] arObjectList = {
-    new ARObject(R.drawable.room1, new Vector3(2.5f, 2.0f, 1)),
-    new ARObject(R.drawable.room2, new Vector3(2.5f, -3.0f, 1)),
-    new ARObject(R.drawable.room3, new Vector3(-4.0f, -3.5f, 1)),
-    new ARObject(R.drawable.room4, new Vector3(-5.5f, -4.0f, 1)),
-    new ARObject(R.drawable.room5, new Vector3(-6.0f, -3.0f, 1)),
-    new ARObject(R.drawable.upstairs, new Vector3(3.5f, 8.0f, 1))
+  private final ARObject[] arObjectList = {
+      new ARObject(R.drawable.room1, new Vector3(2.5f, 2.0f, 1)),
+      new ARObject(R.drawable.room2, new Vector3(2.5f, -3.0f, 1)),
+      new ARObject(R.drawable.room3, new Vector3(-4.0f, -3.5f, 1)),
+      new ARObject(R.drawable.room4, new Vector3(-5.5f, -4.0f, 1)),
+      new ARObject(R.drawable.room5, new Vector3(-6.0f, -3.0f, 1)),
+      new ARObject(R.drawable.upstairs, new Vector3(3.5f, 8.0f, 1))
   };
 
   AugmentedImageNode(Anchor anchor, Scene scene) {
