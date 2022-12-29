@@ -1,0 +1,123 @@
+{
+  "repoId": "repoId",
+  "repoName": "",
+  "repoURL": "",
+  "branchName": "master",
+  "commitId": "",
+  "customerId": "cliCustomer",
+  "scanId": null,
+  "permissionList": [
+    {
+      "category": "Device Sensor Input",
+      "element": "Camera",
+      "dataElement": null,
+      "sensitive": false,
+      "sensitivity": "low",
+      "score": 1,
+      "confidence": "high",
+      "scoringPoints": [],
+      "occurrences": [
+        {
+          "score": 1,
+          "confidence": "high",
+          "scoringPoints": [],
+          "sample": "android.permission.CAMERA",
+          "fileName": "AndroidManifest.xml",
+          "language": "app-permissions",
+          "excerpt": "        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"28\" />\n\n    <uses-permission android:name=\"android.permission.CAMERA\" />\n    <!--\n       This tag indicates that this application requires ARCore.  This results in the application\n       only being visible in the Google Play Store on devices that support ARCore.\n",
+          "isCorrect": null,
+          "occurrenceIndexes": [
+            {
+              "lineNumber": 3,
+              "startIndex": 35,
+              "endIndex": 60
+            }
+          ],
+          "startLocationLine": 24,
+          "authorEmail": null
+        },
+        {
+          "score": 1,
+          "confidence": "high",
+          "scoringPoints": [],
+          "sample": "android.permission.CAMERA",
+          "fileName": "app/build/intermediates/bundle_manifest/release/bundle-manifest/AndroidManifest.xml",
+          "language": "app-permissions",
+          "excerpt": "        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"29\" />\n\n    <uses-permission android:name=\"android.permission.CAMERA\" />\n    <!--\n       This tag indicates that this application requires ARCore.  This results in the application\n       only being visible in the Google Play Store on devices that support ARCore.\n",
+          "isCorrect": null,
+          "occurrenceIndexes": [
+            {
+              "lineNumber": 3,
+              "startIndex": 35,
+              "endIndex": 60
+            }
+          ],
+          "startLocationLine": 24,
+          "authorEmail": null
+        },
+        {
+          "score": 1,
+          "confidence": "high",
+          "scoringPoints": [],
+          "sample": "android.permission.CAMERA",
+          "fileName": "app/build/intermediates/bundle_manifest/debug/bundle-manifest/AndroidManifest.xml",
+          "language": "app-permissions",
+          "excerpt": "        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"29\" />\n\n    <uses-permission android:name=\"android.permission.CAMERA\" />\n    <!--\n       This tag indicates that this application requires ARCore.  This results in the application\n       only being visible in the Google Play Store on devices that support ARCore.\n",
+          "isCorrect": null,
+          "occurrenceIndexes": [
+            {
+              "lineNumber": 3,
+              "startIndex": 35,
+              "endIndex": 60
+            }
+          ],
+          "startLocationLine": 24,
+          "authorEmail": null
+        },
+        {
+          "score": 1,
+          "confidence": "high",
+          "scoringPoints": [],
+          "sample": "android.permission.CAMERA",
+          "fileName": "app/build/intermediates/merged_manifests/debug/AndroidManifest.xml",
+          "language": "app-permissions",
+          "excerpt": "        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"31\" />\n\n    <uses-permission android:name=\"android.permission.CAMERA\" />\n    <!--\n       This tag indicates that this application requires ARCore.  This results in the application\n       only being visible in the Google Play Store on devices that support ARCore.\n",
+          "isCorrect": null,
+          "occurrenceIndexes": [
+            {
+              "lineNumber": 3,
+              "startIndex": 35,
+              "endIndex": 60
+            }
+          ],
+          "startLocationLine": 24,
+          "authorEmail": null
+        },
+        {
+          "score": 1,
+          "confidence": "high",
+          "scoringPoints": [],
+          "sample": "android.permission.CAMERA",
+          "fileName": "app/build/intermediates/packaged_manifests/debug/AndroidManifest.xml",
+          "language": "app-permissions",
+          "excerpt": "        android:minSdkVersion=\"24\"\n        android:targetSdkVersion=\"31\" />\n\n    <uses-permission android:name=\"android.permission.CAMERA\" />\n    <!--\n       This tag indicates that this application requires ARCore.  This results in the application\n       only being visible in the Google Play Store on devices that support ARCore.\n",
+          "isCorrect": null,
+          "occurrenceIndexes": [
+            {
+              "lineNumber": 3,
+              "startIndex": 35,
+              "endIndex": 60
+            }
+          ],
+          "startLocationLine": 24,
+          "authorEmail": null
+        }
+      ]
+    }
+  ],
+  "piiList": [],
+  "vendorList": [],
+  "interestsubjectList": [],
+  "created": "2022-06-15 06:03:07.861617",
+  "updated": "2022-06-15 06:03:07.861642"
+}
