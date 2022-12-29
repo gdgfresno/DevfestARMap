@@ -15,22 +15,32 @@
 package com.valleydevfest.armap;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentOnAttachListener;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.ar.core.Anchor;
 import com.google.ar.core.AugmentedImage;
-import com.google.ar.core.Frame;
+import com.google.ar.core.AugmentedImageDatabase;
+import com.google.ar.core.Config;
 import com.google.ar.core.Session;
+import com.google.ar.core.TrackingState;
 import com.google.ar.sceneform.ArSceneView;
-import com.google.ar.sceneform.FrameTime;
 import com.google.ar.sceneform.Scene;
+import com.google.ar.sceneform.Sceneform;
 import com.google.ar.sceneform.ux.ArFragment;
-import java.util.Collection;
+import com.google.ar.sceneform.ux.BaseArFragment;
+import com.google.ar.sceneform.ux.InstructionsController;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,11 +55,12 @@ import java.util.Map;
  * href="https://developers.google.com/ar/develop/c/augmented-images/">Recognize and Augment
  * Images</a>.
  */
-public class AugmentedImageActivity extends AppCompatActivity {
+public class AugmentedImageActivity extends AppCompatActivity implements FragmentOnAttachListener, BaseArFragment.OnSessionConfigurationListener {
   private static final String TAG = "AugmentedImageActivity";
 
   private ArFragment arFragment;
   private ImageView fitToScanView;
+  private boolean imageDetected = false;
 
   // Augmented image and its associated center pose anchor, keyed by the augmented image in
   // the database.
@@ -60,13 +71,16 @@ public class AugmentedImageActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    arFragment = (ArFragment) getSupportFragmentManager().findFragmentById(R.id.sceneform_fragment);
-    fitToScanView = findViewById(R.id.image_view_fit_to_scan);
+    getSupportFragmentManager().addFragmentOnAttachListener(this);
+    if (savedInstanceState == null) {
+      if (Sceneform.isSupported(this)) {
+        getSupportFragmentManager().beginTransaction()
+            .add(R.id.arFragment, ArFragment.class, null)
+            .commit();
+      }
+    }
 
-    arFragment.getArSceneView().getScene().addOnUpdateListener(frameTime -> {
-      arFragment.onUpdate(frameTime);
-      onUpdateFrame(frameTime);
-    });
+    fitToScanView = findViewById(R.id.image_view_fit_to_scan);
 
     showARWarning();
   }
@@ -88,57 +102,63 @@ public class AugmentedImageActivity extends AppCompatActivity {
     }
   }
 
-  /**
-   * Registered with the Sceneform Scene object, this method is called at the start of each frame.
-   *
-   * @param frameTime - time since last frame.
-   */
-  private void onUpdateFrame(FrameTime frameTime) {
-    Frame frame = arFragment.getArSceneView().getArFrame();
-
-    // If there is no frame, just return.
-    if (frame == null) {
+  public void onAugmentedImageTrackingUpdate(AugmentedImage augmentedImage) {
+    // If the images is already detected, for better CPU usage we do not need to scan for it
+    if (imageDetected) {
       return;
     }
 
-    Collection<AugmentedImage> updatedAugmentedImages =
-        frame.getUpdatedTrackables(AugmentedImage.class);
-    for (AugmentedImage augmentedImage : updatedAugmentedImages) {
-      switch (augmentedImage.getTrackingState()) {
-        case PAUSED:
-          // When an image is in PAUSED state, but the camera is not PAUSED, it has been detected,
-          // but not yet tracked.
-          String text = "Detected Image " + augmentedImage.getIndex();
-          Snackbar.make(findViewById(android.R.id.content),
-                  text, Snackbar.LENGTH_LONG).setAction("Action", null).show();
+    if (augmentedImage.getTrackingState() == TrackingState.TRACKING
+        && augmentedImage.getTrackingMethod() == AugmentedImage.TrackingMethod.FULL_TRACKING) {
 
-          break;
+      // Have to switch to UI Thread to update View.
+      fitToScanView.setVisibility(View.GONE);
 
-        case TRACKING:
-          // Have to switch to UI Thread to update View.
-          fitToScanView.setVisibility(View.GONE);
-
-          // Create a new anchor for newly found images.
-          if (!augmentedImageMap.containsKey(augmentedImage)) {
-            ArSceneView arSceneView = arFragment.getArSceneView();
-            Session session = arSceneView.getSession();
-            assert session != null;
-            Anchor anchor = session.createAnchor(augmentedImage.getCenterPose());
-            Scene scene = arSceneView.getScene();
-            AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, scene);
-            augmentedImageNode.populateScene(this);
-            augmentedImageMap.put(augmentedImage, augmentedImageNode);
-            arSceneView.getPlaneRenderer().setShadowReceiver(false);
-          }
-          break;
-
-        case STOPPED:
-          AugmentedImageNode node = augmentedImageMap.get(augmentedImage);
-          augmentedImageMap.remove(augmentedImage);
-          if (node != null)
-            arFragment.getArSceneView().getScene().removeChild(node);
-          break;
+      // Create a new anchor for newly found images.
+      if (!augmentedImageMap.containsKey(augmentedImage)) {
+        ArSceneView arSceneView = arFragment.getArSceneView();
+        Session session = arSceneView.getSession();
+        assert session != null;
+        Anchor anchor = session.createAnchor(augmentedImage.getCenterPose());
+        Scene scene = arSceneView.getScene();
+        AugmentedImageNode augmentedImageNode = new AugmentedImageNode(anchor, scene);
+        augmentedImageNode.populateScene(this);
+        augmentedImageMap.put(augmentedImage, augmentedImageNode);
+        arSceneView.getPlaneRenderer().setShadowReceiver(false);
       }
+
+      arFragment.getInstructionsController().setEnabled(
+          InstructionsController.TYPE_AUGMENTED_IMAGE_SCAN, false);
+      imageDetected = true;
+    }
+  }
+
+  @Override
+  public void onSessionConfiguration(Session session, Config config) {
+    // From https://github.com/SceneView/sceneform-android/blob/master/samples/augmented-images/src/main/java/com/google/ar/sceneform/samples/augmentedimages/MainActivity.java
+    config.setPlaneFindingMode(Config.PlaneFindingMode.DISABLED);
+
+    // Use setFocusMode to configure auto-focus.
+    config.setFocusMode(Config.FocusMode.AUTO);
+    config.setLightEstimationMode(Config.LightEstimationMode.DISABLED);
+
+    // Load a pre-built AugmentedImageDatabase
+    try (InputStream is = getResources().openRawResource(R.raw.activator)) {
+      AugmentedImageDatabase augmentedImageDatabase = AugmentedImageDatabase.deserialize(session, is);
+      config.setAugmentedImageDatabase(augmentedImageDatabase);
+    } catch (IOException e) {
+      Log.e(TAG, "IO exception loading augmented image database.", e);
+    }
+
+    // Check for image detection
+    arFragment.setOnAugmentedImageUpdateListener(this::onAugmentedImageTrackingUpdate);
+  }
+
+  @Override
+  public void onAttachFragment(@NonNull FragmentManager fragmentManager, @NonNull Fragment fragment) {
+    if (fragment.getId() == R.id.arFragment) {
+      arFragment = (ArFragment) fragment;
+      arFragment.setOnSessionConfigurationListener(this);
     }
   }
 }

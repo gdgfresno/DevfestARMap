@@ -15,9 +15,8 @@
     android:layout_height="match_parent"
     tools:context=".AugmentedImageActivity">
 
-
-    <fragment android:name="com.valleydevfest.armap.AugmentedImageFragment"
-        android:id="@+id/sceneform_fragment"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/arFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
